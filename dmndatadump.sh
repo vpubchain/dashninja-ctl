@@ -34,7 +34,7 @@ if [[ "$1" == "log" ]]; then
   votesrrdlog=/var/log/dmn/votesrrd.$rundate.log
   balancelog=/var/log/dmn/balance.$rundate.log
   portchecklog=/var/log/dmn/portcheck.$rundate.log
-  blockparserlog=/var/log/dmn/blockparser.$rundate.log
+  blockparserlog=/var/log/dmn/blockparser.log
   autoupdatelog=/var/log/dmn/autoupdate.$rundate.log
 fi
 

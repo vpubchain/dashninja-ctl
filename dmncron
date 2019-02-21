@@ -39,15 +39,23 @@ fi
 #/opt/dmnctl/dashdupdate >> $updatelog
 /usr/bin/timeout 10m /opt/dmnctl/dmnctl status >> $statuslog
 #/opt/dmnctl/dmnvotesrrd >> $votesrrdlog
+
 /usr/bin/php /opt/dmnctl/dmndbgen masternodeactive >> $statuslog
-/usr/bin/php /home/dash-mnwww/www/main/api/cron.php main nodesstatus >> $statuslog
-/usr/bin/php /home/dash-mnwww/www/main/api/cron.php main blocksconsensus >> $statuslog
-/usr/bin/php /home/dash-mnwww/www/main/api/cron.php main votelimit >> $statuslog
-/usr/bin/php /home/dash-mnwww/www/main/api/cron.php main masternodeslistfull >> $statuslog
-/usr/bin/php /home/dash-mnwww/www/main/api/cron.php main governanceproposals >> $statuslog
-/usr/bin/php /home/dash-mnwww/www/main/api/cron.php main governancetriggers >> $statuslog
 
 # Concurrently run scripts
+
 /usr/bin/nice -n 18 /opt/dmnctl/dmnbalance >> $balancelog &
 /usr/bin/nice -n 19 /opt/dmnctl/dmnportcheck db >> $portchecklog &
-/usr/bin/nice -n 15 /opt/dmnctl/dmnautoupdate >> $autoupdatelog &
+
+/usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main nodesstatus >> $statuslog
+/usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main blocksconsensus >> $statuslog
+/usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main votelimit >> $statuslog
+/usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main masternodeslistfull >> $statuslog
+/usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main governanceproposals >> $statuslog
+/usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main governancetriggers >> $statuslog
+
+# Concurrently run scripts
+
+#/usr/bin/nice -n 18 /opt/dmnctl/dmnbalance >> $balancelog &
+#/usr/bin/nice -n 19 /opt/dmnctl/dmnportcheck db >> $portchecklog &
+#/usr/bin/nice -n 15 /opt/dmnctl/dmnautoupdate >> $autoupdatelog &

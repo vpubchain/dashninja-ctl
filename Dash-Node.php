@@ -24,7 +24,12 @@ namespace Dash;
 use Exception;
 
 define('PROTOCOL_VERSION',70208);
-define('PROTOCOL_MAGIC',"\xbf\x0c\x6b\xbd");
+//pchMessageStart[0] = 0x90;
+//pchMessageStart[1] = 0x0d;
+//pchMessageStart[2] = 0x90;
+//pchMessageStart[3] = 0x3c;
+define('PROTOCOL_MAGIC',"\x90\x0d\x90\x3c");
+//define('PROTOCOL_MAGIC',"\xbf\x0c\x6b\xbd");
 define('HRVERSION',"/Dash Core:%s/Dash Ninja Port Checker:%s.%d/");
 define('THISVERSION',5);
 
@@ -47,25 +52,28 @@ class EUnexpectedFragmentation extends Exception {}
 class Node {
 	private $sock;
 	private $version = 0;
+	private $subver;
 	private $myself;
 	private $queue = array();
-        private $subver;
-        private $prot_magic;
+    private $prot_magic;
 
 	public function __construct($ip, $port = 9999, $timeout = 5, $versionid = '1.0.0', $sversionid = '0.12.2.2', $protver = PROTOCOL_VERSION, $prot_magic = PROTOCOL_MAGIC) {
 		$this->sock = @fsockopen($ip, $port, $errno, $errstr, $timeout);
+		
 		if (!$this->sock) throw new Exception($errstr, $errno);
-
+		
 		$this->myself = pack('NN', mt_rand(0,0xffffffff), mt_rand(0, 0xffffffff));
-                $this->prot_magic = $prot_magic;
-
+				$this->prot_magic = $prot_magic;
+		
 		// send "version" packet
+
 		$pkt = $this->_makeVersionPacket($protver,$versionid,$sversionid);
 		fwrite($this->sock, $pkt);
-
+		
 		// wait for reply
 		while((!feof($this->sock)) && ($this->version == 0)) {
 			$pkt = $this->readPacket();
+			var_dump($pkt);
 			switch($pkt['type']) {
 				case 'version':
 					if ($this->version != 0) throw new Exception('Got version packet twice!');
@@ -157,11 +165,18 @@ class Node {
         public function getSubVer() {
 		return $this->subver;
         }
-
+	public function checkSubVer($version){
+		//if($this->getSubVer() == 0){
+			$this->subver = $version;
+		//}
+	}
 	protected function _decodeVersionPayload($data) {
+		xecho('_decodeVersionPayload:');
+		var_dump($data);
                 $datasubver = substr($data,81);
                 $datasubver = substr($datasubver,strpos($datasubver,'/'));
-                $this->subver = substr($datasubver,0,strrpos($datasubver,'/')+1);
+				$this->subver = substr($datasubver,1,strrpos($datasubver,'/')-1);
+				//$this->subver = substr($datasubver,0,strrpos($datasubver,'/'));
 		$data = unpack('Vversion/V2nServices/V2timestamp', $data);
 
 		$this->version = $data['version'];
@@ -260,7 +275,7 @@ class Node {
 
 	protected function _makePacket($type, $data) {
 		$packet = $this->prot_magic; // magic header
-//                echo "_makePacket - PROT_MAGIC: [".strToHex($this->prot_magic)."]";
+        echo "_makePacket - PROT_MAGIC: [".strToHex($this->prot_magic)."]";
 		$packet .= $type . str_repeat("\0", 12-strlen($type));
 		$packet .= pack('V', strlen($data));
 		if ((!is_null($data)) && ($this->version > 0x209 || $this->version == 0)) $packet .= $this->_checksum($data);

@@ -1,4 +1,4 @@
-#!/bin/zsh
+#bin/zsh
 #
 #   This file is part of Dash Ninja.
 #   https://github.com/elbereth/dashninja-ctl
@@ -26,10 +26,11 @@ blocksjsonlog=/dev/null
 if [[ "$1" == "log" ]]; then
   blockdegapperlog=/var/log/dmn/blockdegapper.log
   blocksjsonlog=/var/log/dmn/blocksjson.log
+  blockparserlog=/var/log/dmn/dmnblockparser.log
 fi
 
 # Sequentially run scripts
 /usr/bin/nice -n 14 /opt/dmnctl/dmnblockdegapper main >> $blockdegapperlog
 /usr/bin/nice -n 14 /opt/dmnctl/dmnblockparser >> $blockparserlog
-/usr/bin/nice -n 14 /usr/bin/php /home/dash-mnwww/www/main/api/cron.php main blocks24h >> $blocksjsonlog
-/usr/bin/nice -n 14 /usr/bin/php /home/dash-mnwww/www/main/api/cron.php main blockssuperblocks >> $blocksjsonlog
+/usr/bin/nice -n 14 /usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main blocks24h >> $blocksjsonlog
+/usr/bin/nice -n 14 /usr/bin/php /home/lixu/git/dashininja/dashninja-fe/api/cron.php main blockssuperblocks >> $blocksjsonlog

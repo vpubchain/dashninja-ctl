@@ -101,7 +101,7 @@ SELECT NC.BlockHeight BlockHeight, BlockMNPayee, BlockMNRatio FROM _cibh_maxnode
 EOT;
 $sql = sprintf($sql,$blockfrom,$blockto,$testnet);
 xecho("Executing query....\n");
-//echo $sql."\n";
+echo $sql."\n";
 $blockhist = array();
 if ($mysqli->multi_query($sql) &&
   $mysqli->more_results() && $mysqli->next_result() &&
@@ -122,6 +122,7 @@ if ($mysqli->multi_query($sql) &&
         ." ON DUPLICATE KEY UPDATE BlockMNPayeeExpected = VALUES(BlockMNPayeeExpected), BlockMNValueRatioExpected = VALUES(BlockMNValueRatioExpected)";
 //  echo $sql."\n";
   xecho("Updating expected values in block database:\n");
+  xecho($sql);
   if ($result = $mysqli->query($sql)) {
     xecho("  Done (".$mysqli->info.")\n");
   }

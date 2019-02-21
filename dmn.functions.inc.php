@@ -32,7 +32,7 @@ function dmn_checkpid($pid) {
     $output = array();
     exec('ps -o comm -p '.$pid,$output,$retval);
     if (($retval == 0) && (is_array($output)) && (count($output)>=2)) {
-      return (((strlen($output[1]) >= 5) && (substr($output[1], 0, 5) == 'dashd')) || ((strlen($output[1]) >= 9) && (substr($output[1], 0, 9) == 'darkcoind')));
+      return (((strlen($output[1]) >= 5) && (substr($output[1], 0, 5) == 'vpubd')) || ((strlen($output[1]) >= 9) && (substr($output[1], 0, 9) == 'darkcoind')));
     }
     else {
       return false;
@@ -46,27 +46,16 @@ function dmn_checkpid($pid) {
 
 // Returns the PID for the specified username
 function dmn_getpid($uname,$testnet = false) {
-
+  xecho('dmn_getpid:' . $uname . ' testnet:' . $testnet);
   if ($testnet) {
     $testinfo = '/testnet3';
   }
   else {
     $testinfo = '';
   }
-  if (file_exists(DMN_PID_PATH.$uname."/.darkcoin$testinfo/darkcoind.pid") !== FALSE) {
-    $res = trim(file_get_contents(DMN_PID_PATH.$uname."/.darkcoin$testinfo/darkcoind.pid"));
-  }
-  else if (file_exists(DMN_PID_PATH.$uname."/.dashcore$testinfo/dashd.pid") !== FALSE) {
-    $res = trim(file_get_contents(DMN_PID_PATH.$uname."/.dashcore$testinfo/dashd.pid"));
-  }
-  else if (file_exists(DMN_PID_PATH.$uname."/.dashcore$testinfo/dash.pid") !== FALSE) {
-    $res = trim(file_get_contents(DMN_PID_PATH.$uname."/.dashcore$testinfo/dash.pid"));
-  }
-  else if (file_exists(DMN_PID_PATH.$uname."/.dash$testinfo/dashd.pid") !== FALSE) {
-    $res = trim(file_get_contents(DMN_PID_PATH.$uname."/.dash$testinfo/dashd.pid"));
-  }
-  else if (file_exists(DMN_PID_PATH.$uname."/.dash$testinfo/dash.pid") !== FALSE) {
-    $res = trim(file_get_contents(DMN_PID_PATH.$uname."/.dash$testinfo/dash.pid"));
+  xecho('dmn_getpid:' . $uname . ' testinfo:' . $testinfo);
+  if (file_exists(DMN_PID_PATH.$uname."/.vpubcore$testinfo/vpubd.pid") !== FALSE) {
+    $res = trim(file_get_contents(DMN_PID_PATH.$uname."/.vpubcore$testinfo/vpubd.pid"));
   }
   else {
     $res = false;
@@ -136,11 +125,11 @@ function dmn_cmd_get($command,$payload = array(),&$response) {
 
   $ch = curl_init();
   curl_setopt( $ch, CURLOPT_USERAGENT, basename($argv[0])."/".DMN_VERSION );
-  curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 2 );
-  curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true );
-  curl_setopt( $ch, CURLOPT_SSLCERT, DMN_SSL_CERT);
-  curl_setopt( $ch, CURLOPT_SSLKEY, DMN_SSL_KEY);
-  curl_setopt( $ch, CURLOPT_CAINFO, DMN_SSL_CAINFO );
+  //curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 2 );
+  //curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true );
+  //curl_setopt( $ch, CURLOPT_SSLCERT, DMN_SSL_CERT);
+  //curl_setopt( $ch, CURLOPT_SSLKEY, DMN_SSL_KEY);
+  //curl_setopt( $ch, CURLOPT_CAINFO, DMN_SSL_CAINFO );
   curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 10 );
   curl_setopt( $ch, CURLOPT_INTERFACE, DMN_INTERFACE );
   curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
@@ -153,12 +142,15 @@ function dmn_cmd_get($command,$payload = array(),&$response) {
     $payloadurl = '';
   }
   curl_setopt( $ch, CURLOPT_URL, DMN_URL_CMD.$command.$payloadurl );
+  var_dump(DMN_URL_CMD.$command.$payloadurl);
   curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
       'Content-Length: 0'
   ) );
 
   $content = curl_exec( $ch );
   $response = curl_getinfo( $ch );
+  
+  var_dump($content);
 
   return $content;
 
@@ -175,11 +167,11 @@ function dmn_cmd_post($command,$payload,&$response) {
   $ch = curl_init();
   curl_setopt( $ch, CURLOPT_USERAGENT, basename($argv[0])."/".DMN_VERSION );
   curl_setopt( $ch, CURLOPT_URL, DMN_URL_CMD.$command );
-  curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 2 );
-  curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true );
-  curl_setopt( $ch, CURLOPT_SSLCERT, DMN_SSL_CERT);
-  curl_setopt( $ch, CURLOPT_SSLKEY, DMN_SSL_KEY);
-  curl_setopt( $ch, CURLOPT_CAINFO, DMN_SSL_CAINFO );
+  //curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 2 );
+  //curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true );
+  //curl_setopt( $ch, CURLOPT_SSLCERT, DMN_SSL_CERT);
+  //curl_setopt( $ch, CURLOPT_SSLKEY, DMN_SSL_KEY);
+  //curl_setopt( $ch, CURLOPT_CAINFO, DMN_SSL_CAINFO );
   curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 10 );
   curl_setopt( $ch, CURLOPT_INTERFACE, DMN_INTERFACE );
   curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
@@ -278,4 +270,33 @@ function semaphore($semaphore) {
 
 }
 
+//do not use file_get_contents
+/*function curl_file_get_contents($durl){
+  global $argv;
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $durl);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+  curl_setopt($ch, CURLOPT_USERAGENT, basename($argv[0])."/".DMN_VERSION);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+  //curl_setopt($ch, CURLOPT_REFERER,_REFERER_);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  $r = curl_exec($ch);
+  curl_close($ch);
+  return $r;
+}
+*/
+function curl_file_get_contents($url){
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5000);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4'));
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+  $contents = curl_exec($ch);
+  curl_close($ch);//关闭一打开的会话
+  return $contents;
+}
 ?>

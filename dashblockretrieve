@@ -45,7 +45,7 @@ if ($argc >= 4) {
   $blockidto = intval($argv[3]);
 }
 else {
-  $blockidto = $blockidfrom;
+  $blockidto = $blockidfrom;  
 }
 if ($blockidto < $blockidfrom) {
   xecho("Parameter error: $blockidto must be after $blockidfrom\n");
@@ -72,7 +72,7 @@ else {
 
 xecho("Retrieving blocks information:\n");
 for ($x = $blockidfrom; $x <= $blockidto; $x++) {
-  xecho(" Block ID#$x: ");
+  xecho(" Block ID#$x: ");  
   $blockhash = $rpc->getblockhash($x);
   if ($blockhash !== false) {
     echo $blockhash;

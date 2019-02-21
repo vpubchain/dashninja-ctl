@@ -30,6 +30,8 @@ function dmn_checkportopen($ip, $port, $testnet, $config, &$subver, &$errmsg) {
   $subver = '';
   $errmsg = '';
   $res = 0;
+  xecho('dmn_checkportopen');
+  var_dump($config);
 //  $version = $config[$testnet]['Version'];
   $sversion = $config[$testnet]['SatoshiVersion'];
   $protocol = $config[$testnet]['ProtocolVersion'];
@@ -38,21 +40,23 @@ function dmn_checkportopen($ip, $port, $testnet, $config, &$subver, &$errmsg) {
   {
     $c = new \Dash\Node($ip,$port,DMN_PORTCHECK_TIMEOUT,DMN_VERSION,$sversion,$protocol,$magic);
     $subver = $c->getSubVer();
+    xecho('subver=' . $subver);
+    echo("\n");
     $c->closeConnection();
     $res = 1;
   }
   catch (\Dash\EFailedToReadFromPeer $eftrfp) {
-    $subver = '';
+    $subver = $sversion;
     $errmsg = $eftrfp->getMessage();
     $res = 1;
   }
   catch (\Dash\EUnexpectedFragmentation $euf) {
-    $subver = '';
+    $subver = $sversion;
     $errmsg = $euf->getMessage();
     $res = 1;
   }
   catch (\Dash\EUnexpectedPacketType $eupt) {
-    $subver = '';
+    $subver = $sversion;
     $errmsg = $eupt->getMessage();
     $res = 3;
   }

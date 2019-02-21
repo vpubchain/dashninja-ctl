@@ -134,19 +134,24 @@ xecho("Computing balances to check: ");
 $numok = 0;
 $mncheck = array();
 $mnchecknot = array();
+xecho("mnpubkeys count: " . count($mnpubkeys));
+var_dump($mnpubkeys);
 foreach($mnpubkeys as $mnpubkey) {
   if (array_key_exists($mnpubkey,$mnlastupdate)) {
     $numok++;
     $delta = time() - $mnlastupdate[$mnpubkey];
     if ((($argc > 1) && ($argv[1] == 'force')) || ($delta > DMN_BALANCE_INTERVAL)) {
       $mncheck[] = $mnpubkey;
+      xecho("mnpubkeys 1");
     }
     else {
       $mnchecknot[] = $mnpubkey;
+      xecho("mnpubkeys 2");
     }
   }
   else {
     $mncheck[] = $mnpubkey;
+    xecho("mnpubkeys 3");
   }
 }
 $numtok = 0;
@@ -177,16 +182,19 @@ $payload = array();
 $numdone = 0;
 $numtot = count($mncheck)+count($tncheck);
 $nbcar = strlen($numtot);
+xecho('balance mncheck count=' . count($mncheck));
 foreach($mncheck as $mnpubkey) {
   $numdone++;
   xecho("(".str_pad($numdone,$nbcar," ",STR_PAD_LEFT)."/$numtot) Retrieving $mnpubkey balance: ");
   $url = str_replace('%%p%%',$mnpubkey,DMN_BALANCE_URL_MAINNET);
-
-  $res = file_get_contents($url);
+  xecho('balance mncheck url=' . $url);
+  $res = curl_file_get_contents($url);
   if ($res === false) {
     echo "Error\n";
   }
   else {
+    //xecho('balance mncheck url=' . $url);
+    var_dump($res);
     $mncurbalance = floatval($res);
     $mncurbalancerdisplay = sprintf("%.9f",$mncurbalance);
     echo "$mncurbalancerdisplay DASH\n";
@@ -200,8 +208,8 @@ foreach($tncheck as $mnpubkey) {
   $numdone++;
   xecho("($numdone/$numtot) Retrieving $mnpubkey balance: ");
   $url = str_replace('%%p%%',$mnpubkey,DMN_BALANCE_URL_TESTNET);
-
-  $res = file_get_contents($url);
+  xecho('balance url=' . $url);
+  $res = curl_file_get_contents($url);
   if ($res === false) {
     echo "Error\n";
   }
@@ -216,11 +224,13 @@ foreach($tncheck as $mnpubkey) {
   }
 }
 
+xecho('balance count=' . count($payload));
 if (count($payload) > 0) {
   xecho("Submitting ".count($payload)." balances to webservice: ");
   $response = '';
   $content = dmn_cmd_post('/balances',$payload,$response);
-
+  xecho('dmnbalance=');
+  var_dump($payload);
   if ($response['http_code'] == 202) {
     $content = json_decode($content,true);
     echo "OK (".$content['data']['balances'].")\n";
