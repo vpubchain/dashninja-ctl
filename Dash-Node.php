@@ -28,7 +28,7 @@ define('PROTOCOL_VERSION',70208);
 //pchMessageStart[1] = 0x0d;
 //pchMessageStart[2] = 0x90;
 //pchMessageStart[3] = 0x3c;
-define('PROTOCOL_MAGIC',"\x90\x0d\x90\x3c");
+define('PROTOCOL_MAGIC',"\x91\xc4\xf4\xe9");
 //define('PROTOCOL_MAGIC',"\xbf\x0c\x6b\xbd");
 define('HRVERSION',"/Dash Core:%s/Dash Ninja Port Checker:%s.%d/");
 define('THISVERSION',5);

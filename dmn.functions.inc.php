@@ -32,7 +32,7 @@ function dmn_checkpid($pid) {
     $output = array();
     exec('ps -o comm -p '.$pid,$output,$retval);
     if (($retval == 0) && (is_array($output)) && (count($output)>=2)) {
-      return (((strlen($output[1]) >= 5) && (substr($output[1], 0, 5) == 'vpubd')) || ((strlen($output[1]) >= 9) && (substr($output[1], 0, 9) == 'darkcoind')));
+      return (((strlen($output[1]) >= 5) && (substr($output[1], 0, 6) == 'vpubd')) || ((strlen($output[1]) >= 9) && (substr($output[1], 0, 9) == 'darkcoind')));
     }
     else {
       return false;
@@ -54,8 +54,8 @@ function dmn_getpid($uname,$testnet = false) {
     $testinfo = '';
   }
   xecho('dmn_getpid:' . $uname . ' testinfo:' . $testinfo);
-  if (file_exists(DMN_PID_PATH.$uname."/.vpubcore$testinfo/vpubd.pid") !== FALSE) {
-    $res = trim(file_get_contents(DMN_PID_PATH.$uname."/.vpubcore$testinfo/vpubd.pid"));
+  if (file_exists("/root/.vpub/vpubd.pid") !== FALSE) {
+    $res = trim(file_get_contents("/root/.vpub/vpubd.pid"));
   }
   else {
     $res = false;

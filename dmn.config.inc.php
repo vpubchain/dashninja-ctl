@@ -77,10 +77,10 @@ DEFINE('DMN_BALANCE_SEMAPHORE','/var/run/dmnbalance.pid');
 //  Interval between balance retrieval for a pubkey (in seconds)
 DEFINE('DMN_BALANCE_INTERVAL',900);
 //  URL for testnet balance retrieval (abe explorer API)
-DEFINE('DMN_BALANCE_URL_TESTNET','http://47.104.97.209:3001/ext/getbalance/%%p%%');
+DEFINE('DMN_BALANCE_URL_TESTNET','http://127.0.0.1:3001/ext/getbalance/%%p%%');
 //  URL for mainnet balance retrieval (abe explorer API)
 //DEFINE('DMN_BALANCE_URL_MAINNET','https://www.vpubchain.net/abe/chain/Vpub/q/addressbalance/%%p%%');
-DEFINE('DMN_BALANCE_URL_MAINNET','http://47.104.97.209:3001/ext/getbalance/%%p%%');
+DEFINE('DMN_BALANCE_URL_MAINNET','http://127.0.0.1:3001/ext/getbalance/%%p%%');
 https://pl.vpubchain.net/ext/getbalance/XdkZjNuYmBEVEvBLBRvbGYffCT4HLo5Avv
 
 // Block Parser specifics
@@ -114,8 +114,9 @@ DEFINE('DMN_CDL_URL','https://cdl.yourdomain.tk/');
 // Direct access to DB (should not be used)
 DEFINE('DMNCTLMYSQLUSER','dashninja');
 DEFINE('DMNCTLMYSQLPASS','123456');
-DEFINE('DMNCTLMYSQLDATABASE','dashninja_test');
-DEFINE('DMNCTLMYSQLHOST','localhost');
+DEFINE('DMNCTLMYSQLDATABASE','dashninja_phore');
+#DEFINE('DMNCTLMYSQLHOST','172.17.0.1:13306');
+DEFINE('DMNCTLMYSQLHOST','127.0.0.1:3306');
 
 // Webservice configuration
 //  Public API end-point
@@ -127,7 +128,7 @@ define('DMN_SSL_CAINFO','/usr/share/ca-certificates/yourdomain.tk/DashNinja_CA_R
 define('DMN_SSL_CERT','/etc/ssl/private/hub01.cmd.yourdomain.tk.crt');
 define('DMN_SSL_KEY','/etc/ssl/private/hub01.cmd.yourdomain.tk.key');
 //  Private API interface to use
-define('DMN_INTERFACE','192.168.0.175');
+define('DMN_INTERFACE','127.0.0.1');
 
 // Indicate the configuration was loaded
 DEFINE('DMN_CONFIG',true);

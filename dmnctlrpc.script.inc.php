@@ -35,9 +35,9 @@
   $uname = $argv[1];
   $rpccommand = $argv[2];
   $outputfile = $argv[3];
-  $nodepath1 = DMN_PID_PATH.$uname.'/.vpubcore/';
-$nodepath2 = DMN_PID_PATH.$uname.'/.vpubcore/';
-$nodepath3 = DMN_PID_PATH.$uname.'/.vpubcore/';
+  $nodepath1 = '/usr/local/bin/';
+$nodepath2 = '/usr/local/bin/';
+$nodepath3 = '/usr/local/bin/';
 
   if (is_dir($nodepath1)) {
     $nodepath = $nodepath1;

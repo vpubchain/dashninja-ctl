@@ -69,16 +69,9 @@ class DashConfig {
 
   function __construct($uname) {
 
-    if (file_exists('/home/'.$uname.'/.vpubcore/vpub.conf')) {
-      $this->configfilename = '/home/'.$uname.'/.vpubcore/vpub.conf';
+    if (file_exists('/root/.vpub/vpub.conf')) {
+      $this->configfilename = '/root/.vpub/vpub.conf';
     }
-    /*
-    elseif (file_exists('/home/'.$uname.'/.vpubcore/vpub.conf')) {
-      $this->configfilename = '/home/'.$uname.'/.vpubcore/vpub.conf';
-    }
-    else {
-      $this->configfilename = '/home/'.$uname.'/.vpubcore/vpub.conf';
-    }*/
     $this->loadconfig();
 
   }

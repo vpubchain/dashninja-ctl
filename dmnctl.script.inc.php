@@ -55,7 +55,7 @@ function dmn_getcountry($mnip,&$countrycode) {
 function dmn_getip($pid,$uname) {
 
   $res = false;
-  exec('netstat -ntpl | grep "tcp  " | egrep ":([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])" | grep "'.$pid.'/darkcoind\|'.$pid.'/dashd"',$output,$retval);
+  exec('netstat -ntpl | grep "tcp  " | egrep ":([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])" | grep "'.$pid.'/vpubd"',$output,$retval);
   if (isset($output[0])) {
     if (preg_match("/tcp        0      0 (\d*\.\d*.\d*.\d*:\d*)/", $output[0], $output_array) == 1) {
       $res = $output_array[1];
@@ -525,10 +525,10 @@ function dmn_create($dmnpid,$ip,$forcename = '') {
     echo "retval=$retval\n";
   }
   echo "Generating dash.conf";
-  mkdir("/home/$newuname/.vpubcore");
-  touch("/home/$newuname/.vpubcore/vpub.conf");
-  chmod("/home/$newuname/.vpubcore",0700);
-  chmod("/home/$newuname/.vpubcore/vpub.conf",0600);
+  mkdir("/root/.vpub");
+  touch("/root/.vpub/vpub.conf");
+  chmod("/root/.vpub",0700);
+  chmod("/root/.vpub/vpub.conf",0600);
   $conflist = array('server=1',
          'rpcuser='.$newuname.'rpc',
          'rpcpassword='.randomPassword(128),
@@ -544,20 +544,20 @@ function dmn_create($dmnpid,$ip,$forcename = '') {
   }
 
   $dashconf = implode("\n",$conflist);
-  file_put_contents("/home/$newuname/.vpubcore/vpub.conf",$dashconf);
+  file_put_contents("/root/.vpub/vpub.conf",$dashconf);
   echo "OK\n";
   echo "Setting ACL";
-  if (file_exists("/home/$newuname/.bash_history")) {
-    chmod("/home/$newuname/.bash_history",0600);
+  if (file_exists("/root/.bash_history")) {
+    chmod("/root/.bash_history",0600);
   }
-  chmod("/home/$newuname/.bashrc",0600);
-  chmod("/home/$newuname/.profile",0600);
-  chmod("/home/$newuname/.bash_logout",0600);
-  chmod("/home/$newuname/",0700);
-  chown("/home/$newuname/.vpubcore/",$newuname);
-  chgrp("/home/$newuname/.vpubcore/",$newuname);
-  chown("/home/$newuname/.vpubcore/vpub.conf",$newuname);
-  chgrp("/home/$newuname/.vpubcore/vpub.conf",$newuname);
+  chmod("/root/.bashrc",0600);
+  chmod("/root/.profile",0600);
+  chmod("/root/.bash_logout",0600);
+  chmod("/root/",0700);
+  chown("/root/.vpub/",$newuname);
+  chgrp("/root/.vpub/",$newuname);
+  chown("/root/.vpub/vpub.conf",$newuname);
+  chgrp("/root/.vpub/vpub.conf",$newuname);
   echo "OK\n";
   echo "Add to /etc/network/interfaces\n";
   echo "        post-up /sbin/ifconfig eth0:$newnum $ip netmask 255.255.255.255 broadcast $ip\n";
@@ -822,14 +822,14 @@ function dmn_status($dmnpid,$istestnet) {
            $commands[] = array("status" => 0,
                "dmnnum" => $dmnnum,
                "datatype" => "mnlistfull",
-               "cmd" => $uname . ' "masternode list full"',
+               "cmd" => $uname . ' "masternode list"',
                "file" => "/dev/shm/dmnctl/$uname.$tmpdate.masternode_list.json");
        }
        else {
            $commands[] = array("status" => 0,
                "dmnnum" => $dmnnum,
                "datatype" => "mnlistfull",
-               "cmd" => $uname . ' "masternode list full"',
+               "cmd" => $uname . ' "masternode list"',
                "file" => "/dev/shm/dmnctl/$uname.$tmpdate.masternode_list.json");
        }
       // v12.1 (vh=4)
@@ -1034,7 +1034,7 @@ function dmn_status($dmnpid,$istestnet) {
           $commands[] = array("status" => 0,
               "dmnnum" => $dmnnum,
               "datatype" => "mnbudget-getvotes-" . $mnbudgetid,
-              "cmd" => $uname . ' "mnbudget getvotes ' . $mnbudgetid . '"',
+              "cmd" => $uname . ' "mnbudgetvote ' . $mnbudgetid . '"',
               "file" => "/dev/shm/dmnctl/$uname.$tmpdate.mnbudget_getvotes_$mnbudgetid.json");
         }
       }
@@ -1043,7 +1043,7 @@ function dmn_status($dmnpid,$istestnet) {
             $commands[] = array("status" => 0,
                 "dmnnum" => $dmnnum,
                 "datatype" => "getsuperblockbudget",
-                "cmd" => $uname . ' "getsuperblockbudget '.$dmnpidinfo["getgovernanceinfo"]["nextsuperblock"].'"',
+                "cmd" => $uname . ' "getnextsuperblock '.$dmnpidinfo["getgovernanceinfo"]["nextsuperblock"].'"',
                 "file" => "/dev/shm/dmnctl/$uname.$tmpdate.getsuperblockbudget.json");
         }
         if  (array_key_exists("gobjectlist",$dmnpidinfo) && is_array($dmnpidinfo["gobjectlist"])) {
@@ -1066,7 +1066,7 @@ function dmn_status($dmnpid,$istestnet) {
                 $commands[] = array("status" => 0,
                                     "dmnnum" => $dmnnum,
                                     "datatype" => "gobject-getvotes-" . $gobjecthash,
-                                    "cmd" => $uname . ' "gobject getvotes ' . $gobjecthash . '"',
+                                    "cmd" => $uname . ' "mnbudgetvote ' . $gobjecthash . '"',
                                     "file" => "/dev/shm/dmnctl/$uname.$tmpdate.gobject_getvotes_$gobjecthash.json");
               }
               elseif ($gobjectdata2[0][0] == "trigger") {
@@ -1077,7 +1077,7 @@ function dmn_status($dmnpid,$istestnet) {
                   $commands[] = array("status" => 0,
                       "dmnnum" => $dmnnum,
                       "datatype" => "gobject-getvotes-" . $gobjecthash,
-                      "cmd" => $uname . ' "gobject getvotes ' . $gobjecthash . '"',
+                      "cmd" => $uname . ' "mnbudgetvote ' . $gobjecthash . '"',
                       "file" => "/dev/shm/dmnctl/$uname.$tmpdate.gobject_getvotes_$gobjecthash.json");
               }
             }
@@ -1154,10 +1154,10 @@ function dmn_status($dmnpid,$istestnet) {
 
     // Get default port
     if ($dmnpidinfo['conf']->getconfig('testnet') == '1') {
-      $port = 9900;
+      $port = 11771;
     }
     else {
-      $port = 9900;
+      $port = 11771;
     }
 
     // Default values
@@ -1271,7 +1271,7 @@ function dmn_status($dmnpid,$istestnet) {
                 $active = 0;
               }
               if (!in_array($activetrue,$mnstatusexvalues,true)) {
-                echo "\nWARNING: ".$ip." - Unknown StatusEx: [".$activetrue."]\n";
+                //echo "\nWARNING: ".$ip." - Unknown StatusEx: [".$activetrue."]\n";
                 $activetrue = "__UNKNOWN__";
               }
             }
@@ -1524,6 +1524,7 @@ function dmn_status($dmnpid,$istestnet) {
               $mn3listfull = $dmnpidinfo['mnlistfull'];
           }
           foreach($mn3listfull as $mn3output => $mn3data) {
+            /*
             if ($dmnpidinfo['versionhandling'] <= 5) {
                 // Remove all extra spaces
                 $mn3data = trim($mn3data);
@@ -1531,7 +1532,7 @@ function dmn_status($dmnpid,$istestnet) {
                     $rcount = 0;
                     $mn3data = str_replace("  ", " ", $mn3data, $rcount);
                 } while ($rcount > 0);
-            }
+            }*/
 
             // Store each value separated by spaces
             $mn4lastpaidblock = 0;
@@ -1545,26 +1546,29 @@ function dmn_status($dmnpid,$istestnet) {
               list($mn3status, $mn3protocol, $mn3pubkey, $mn3lastseen, $mn3activeseconds, $mn3lastpaid, $mn4lastpaidblock, $mn3ipport) = explode(" ",$mn3data);
             }
             else {
-              list($mn3status, $mn3protocol, $mn3pubkey, $mn3lastseen, $mn3activeseconds, $mn3lastpaid, $mn4lastpaidblock, $mn3ipport) = explode(" ",$mn3data);
+             /* list($mn3status, $mn3protocol, $mn3pubkey, $mn3lastseen, $mn3activeseconds, $mn3lastpaid, $mn4lastpaidblock, $mn3ipport) = explode(" ",$mn3data);
               xecho('mn3status=' . $mn3status . ' mn3protocol=' . $mn3protocol . ' $mn3pubkey=' . $mn3pubkey);
               xecho('mn3lastseen=' . $mn3lastseen . ' mn3activeseconds=' . $mn3activeseconds . ' $mn3lastpaid=' . $mn3lastpaid);
-              xecho('mn4lastpaidblock=' . $mn4lastpaidblock . ' mn3ipport=' . $mn3ipport);
+              xecho('mn4lastpaidblock=' . $mn4lastpaidblock . ' mn3ipport=' . $mn3ipport);*/
 
-              /*
+              
                 xecho('mn3=');
                 var_dump($mn3data);
                 $mn3status = $mn3data['status'];
-                $mn3protocol = $mn3data['protocol'];
-                $mn3pubkey = $mn3data['payee'];
+                $mn3protocol = $mn3data['version'];
+                $mn3pubkey = $mn3data['addr'];
                 $mn3lastseen = $mn3data['lastseen'];
-                $mn3activeseconds = $mn3data['activeseconds'];
-                $mn3lastpaid = $mn3data['lastpaidtime'];
-                $mn4lastpaidblock = $mn3data['lastpaidblock'];
+                $mn3activeseconds = $mn3data['activetime'];
+                $mn3lastpaid = $mn3data['lastpaid'];
+                //$mn4lastpaidblock = $mn3data['lastpaidblock'];
                 $mn3ipport = $mn3data['address'];
-                $mn5daemonversion = $mn3data['daemonversion'];
-                $mn5sentinelversion = $mn3data['sentinelversion'];
-                $mn5sentinelstate = $mn3data['sentinelstate'];
-                */
+                $mnoutputhash = $mn3data['txhash'];
+                $mnoutputindex = $mn3data['outidx'];
+                //$mn4lastpaidblock = $mn3data['lastpaidblock'];
+                //$mn5daemonversion = $mn3data['daemonversion'];
+                //$mn5sentinelversion = $mn3data['sentinelversion'];
+                //$mn5sentinelstate = $mn3data['sentinelstate'];
+              
             }
 
             // Handle the IPs
@@ -1581,19 +1585,21 @@ function dmn_status($dmnpid,$istestnet) {
               list($mn3ip, $mn3port) = $test;
             }
 
-            if (array_key_exists($mn3output."-".$dashdinfo['testnet'],$mninfo2)) {
-              if ($mn3lastseen < $mninfo2[$mn3output."-".$dashdinfo['testnet']]["MasternodeLastSeen"]) {
-                $mninfo2[$mn3output."-".$dashdinfo['testnet']]["MasternodeLastSeen"] = intval($mn3lastseen);
+            $mn3outputkey = $mnoutputhash."-".$mnoutputindex;
+
+            if (array_key_exists($mn3outputkey."-".$dashdinfo['testnet'],$mninfo2)) {
+              if ($mn3lastseen < $mninfo2[$mn3outputkey."-".$dashdinfo['testnet']]["MasternodeLastSeen"]) {
+                $mninfo2[$mn3outputkey."-".$dashdinfo['testnet']]["MasternodeLastSeen"] = intval($mn3lastseen);
               }
-              if ($mn3activeseconds < $mninfo2[$mn3output."-".$dashdinfo['testnet']]["MasternodeActiveSeconds"]) {
-                $mninfo2[$mn3output."-".$dashdinfo['testnet']]["MasternodeActiveSeconds"] = intval($mn3activeseconds);
+              if ($mn3activeseconds < $mninfo2[$mn3outputkey."-".$dashdinfo['testnet']]["MasternodeActiveSeconds"]) {
+                $mninfo2[$mn3outputkey."-".$dashdinfo['testnet']]["MasternodeActiveSeconds"] = intval($mn3activeseconds);
               }
-              if ($mn3lastpaid > $mninfo2[$mn3output."-".$dashdinfo['testnet']]["MasternodeLastPaid"]) {
-                $mninfo2[$mn3output."-".$dashdinfo['testnet']]["MasternodeLastPaid"] = intval($mn3lastpaid);
+              if ($mn3lastpaid > $mninfo2[$mn3outputkey."-".$dashdinfo['testnet']]["MasternodeLastPaid"]) {
+                $mninfo2[$mn3outputkey."-".$dashdinfo['testnet']]["MasternodeLastPaid"] = intval($mn3lastpaid);
               }
             }
             else {
-              $mninfo2[$mn3output."-".$dashdinfo['testnet']] = array("MasternodeProtocol" => intval($mn3protocol),
+              $mninfo2[$mn3outputkey."-".$dashdinfo['testnet']] = array("MasternodeProtocol" => intval($mn3protocol),
                                                                          "MasternodePubkey" => $mn3pubkey,
                                                                          "MasternodeIP" => $mn3ip,
                                                                          "MasternodePort" => $mn3port,
@@ -1612,10 +1618,10 @@ function dmn_status($dmnpid,$istestnet) {
               $active = 0;
             }
             if (!in_array($mn3status,$mnstatusexvalues,true)) {
-              echo "\nWARNING: ".$mn3output." - Unknown StatusEx: [".$mn3status."] ";
+              echo "\nWARNING: ".$mn3outputkey." - Unknown StatusEx: [".$mn3status."] ";
               $mn3status = "__UNKNOWN__";
             }
-            $mnlist2final[$mn3output."-".$dashdinfo['testnet']][$uname] = array('Status' => $active,
+            $mnlist2final[$mn3outputkey."-".$dashdinfo['testnet']][$uname] = array('Status' => $active,
                                                                                     'StatusEx' => $mn3status);
           }
         }
@@ -1825,6 +1831,7 @@ function dmn_status($dmnpid,$istestnet) {
 
     $wsmnlist2 = array();
     foreach($mnlist2final as $output => $mninfo) {
+      $mntestnet = 0;
       list($mnoutputhash, $mnoutputindex, $mntestnet) = explode("-", $output);
       foreach($mninfo as $mnuname => $mnactive) {
         if ($mnactive['Status'] == 1) {

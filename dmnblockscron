@@ -32,5 +32,5 @@ fi
 # Sequentially run scripts
 /usr/bin/nice -n 14 /opt/dmnctl/dmnblockdegapper main >> $blockdegapperlog
 /usr/bin/nice -n 14 /opt/dmnctl/dmnblockparser >> $blockparserlog
-/usr/bin/nice -n 14 /usr/bin/php /home/lixu/git/dashninja/dashninja-fe/api/cron.php main blocks24h >> $blocksjsonlog
-/usr/bin/nice -n 14 /usr/bin/php /home/lixu/git/dashininja/dashninja-fe/api/cron.php main blockssuperblocks >> $blocksjsonlog
+/usr/bin/nice -n 14 /usr/bin/php /var/www/dashninja/dashninja-fe/api/cron.php main blocks24h >> $blocksjsonlog
+/usr/bin/nice -n 14 /usr/bin/php /var/www/dashininja/dashninja-fe/api/cron.php main blockssuperblocks >> $blocksjsonlog
